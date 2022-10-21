@@ -426,24 +426,27 @@ int main(int argc, char** argv)
 
 
   XmlRpc::XmlRpcValue param;
+  try {
+    nh.getParam("/matrix_file/tlc", param);
+    Tlc << (double)param[0]
+      , (double)param[1]
+      , (double)param[2];
 
-  nh.getParam("/matrix_file/tlc", param);
-  Tlc << (double)param[0]
-    , (double)param[1]
-    , (double)param[2];
+    nh.getParam("/matrix_file/rlc", param);
+    Rlc << (double)param[0], (double)param[1], (double)param[2]
+      , (double)param[3], (double)param[4], (double)param[5]
+      , (double)param[6], (double)param[7], (double)param[8];
 
-  nh.getParam("/matrix_file/rlc", param);
+    nh.getParam("/matrix_file/camera_matrix", param);
+    Mc << (double)param[0], (double)param[1], (double)param[2], (double)param[3]
+      , (double)param[4], (double)param[5], (double)param[6], (double)param[7]
+      , (double)param[8], (double)param[9], (double)param[10], (double)param[11];
+  }
 
+  catch (XmlRpc::XmlRpcException& e) {
+    ROS_ERROR("Failed to read param: %s", e.getMessage().c_str());
+  }
 
-  Rlc << (double)param[0], (double)param[1], (double)param[2]
-    , (double)param[3], (double)param[4], (double)param[5]
-    , (double)param[6], (double)param[7], (double)param[8];
-
-  nh.getParam("/matrix_file/camera_matrix", param);
-
-  Mc << (double)param[0], (double)param[1], (double)param[2], (double)param[3]
-    , (double)param[4], (double)param[5], (double)param[6], (double)param[7]
-    , (double)param[8], (double)param[9], (double)param[10], (double)param[11];
 
   message_filters::Subscriber<PointCloud2> pc_sub(nh, pcTopic, 1);
   message_filters::Subscriber<Image> img_sub(nh, imgTopic, 1);
