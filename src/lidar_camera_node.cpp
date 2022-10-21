@@ -30,6 +30,12 @@
 
 #include <chrono>
 #include <XmlRpcException.h>
+#include <ouster_ros/point.h>
+#include <pcl/common/io.h>
+#include <pcl/filters/passthrough.h>
+#include <pcl/filters/crop_box.h>
+
+
 
 using namespace Eigen;
 using namespace sensor_msgs;
@@ -85,6 +91,7 @@ pcl::RangeImage::CoordinateFrame coordinate_frame = pcl::RangeImage::LASER_FRAME
 
 void callback(const boost::shared_ptr<const sensor_msgs::PointCloud2>& in_pc2, const ImageConstPtr& in_image)
 {
+  ROS_INFO("callback");
   cv_bridge::CvImagePtr cv_ptr, color_pcl;
   try
   {
@@ -102,10 +109,33 @@ void callback(const boost::shared_ptr<const sensor_msgs::PointCloud2>& in_pc2, c
   pcl_conversions::toPCL(*in_pc2, pcl_pc2);
   PointCloud::Ptr msg_pointCloud(new PointCloud);
   pcl::fromPCLPointCloud2(pcl_pc2, *msg_pointCloud);
+
   ///
-  // ROS_INFO("PointCloud before filtering has: %d data points.", msg_pointCloud->points.size());
+  ROS_INFO("PointCloud before filtering has: %d data points.", msg_pointCloud->points.size());
   ////// filter point cloud
   if (msg_pointCloud == NULL) return;
+
+  // ==== Crop out points around origin ==== //
+
+  pcl::CropBox<pcl::PointXYZI> cropBoxFilter(true);
+  cropBoxFilter.setNegative(true);
+  cropBoxFilter.setKeepOrganized(true);
+  cropBoxFilter.setInputCloud(msg_pointCloud);
+  Eigen::Vector4f min_pt(-1.0f, -1.0f, -1.0f, 1.0f);
+  Eigen::Vector4f max_pt(1.0f, 1.0f, 1.0f, 1.0f);
+
+  // Cropbox slighlty bigger then bounding box of points
+  cropBoxFilter.setMin(min_pt);
+  cropBoxFilter.setMax(max_pt);
+
+  // Indices
+  vector<int> indices1;
+  cropBoxFilter.filter(indices1);
+
+  // Cloud
+  PointCloud::Ptr cloud_cropped(new PointCloud);
+  cropBoxFilter.filter(*cloud_cropped);
+  ROS_INFO("PointCloud after box filtering has: %d data points.", cloud_cropped->points.size());
 
   PointCloud::Ptr cloud_in(new PointCloud);
   //PointCloud::Ptr cloud_filter (new PointCloud);
@@ -114,8 +144,8 @@ void callback(const boost::shared_ptr<const sensor_msgs::PointCloud2>& in_pc2, c
   //PointCloud::Ptr cloud_aux (new PointCloud);
  // pcl::PointXYZI point_aux;
 
-  std::vector<int> indices;
-  pcl::removeNaNFromPointCloud(*msg_pointCloud, *cloud_in, indices);
+  std::vector<int> indices2;
+  pcl::removeNaNFromPointCloud(*cloud_cropped, *cloud_in, indices2);
 
   for (int i = 0; i < (int)cloud_in->points.size(); i++)
   {
@@ -127,15 +157,26 @@ void callback(const boost::shared_ptr<const sensor_msgs::PointCloud2>& in_pc2, c
   }
 
   ROS_INFO("PointCloud after filtering has: %d data points.", cloud_out->points.size());
+  ROS_INFO("Camera image size: %d x %d", cv_ptr->image.cols, cv_ptr->image.rows);
+
+  // ============================================================================================================
   //                                                  point cloud to image
+  // ============================================================================================================
 
-  //============================================================================================================
-  //============================================================================================================
-
-  Eigen::Affine3f sensorPose = (Eigen::Affine3f)Eigen::Translation3f(0.0f, 0.0f, 0.0f);
-  rangeImage->pcl::RangeImage::createFromPointCloud(*cloud_out, pcl::deg2rad(angular_resolution_x), pcl::deg2rad(angular_resolution_y),
-    pcl::deg2rad(max_angle_width), pcl::deg2rad(max_angle_height),
-    sensorPose, coordinate_frame, 0.0f, 0.0f, 0);
+  try {
+    Eigen::Affine3f sensorPose = (Eigen::Affine3f)Eigen::Translation3f(0.0f, 0.0f, 0.0f);
+    rangeImage->pcl::RangeImage::createFromPointCloud(*cloud_out, pcl::deg2rad(angular_resolution_x), pcl::deg2rad(angular_resolution_y),
+      pcl::deg2rad(max_angle_width), pcl::deg2rad(max_angle_height),
+      sensorPose, coordinate_frame, 0.0f, 0.0f, 0);
+  }
+  catch (pcl::PCLException& e) {
+    ROS_ERROR_STREAM("Error in creating range image: " << e.what());
+    return;
+  }
+  catch (std::exception& e) {
+    ROS_ERROR_STREAM("Error in creating range image: " << e.what());
+    return;
+  }
 
   ROS_INFO_STREAM("range image created with size: " << rangeImage->width << " x " << rangeImage->height);
 
@@ -347,8 +388,6 @@ void callback(const boost::shared_ptr<const sensor_msgs::PointCloud2>& in_pc2, c
 
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr pc_color(new pcl::PointCloud<pcl::PointXYZRGB>);
 
-  //P_out = cloud_out;
-
   for (int i = 0; i < size_inter_Lidar; i++)
   {
     pc_matrix(0, 0) = -P_out->points[i].y;
@@ -357,14 +396,12 @@ void callback(const boost::shared_ptr<const sensor_msgs::PointCloud2>& in_pc2, c
     pc_matrix(3, 0) = 1.0;
 
     Lidar_cam = Mc * (RTlc * pc_matrix); // point cloud in camera coordinates
-    ROS_INFO("Lidar_cam: %f", Lidar_cam(0, 0));
-    ROS_INFO("Lidar_cam: %f", Lidar_cam(1, 0));
 
     px_data = (int)(Lidar_cam(0, 0) / Lidar_cam(2, 0)); // point x coordinate in the image
     py_data = (int)(Lidar_cam(1, 0) / Lidar_cam(2, 0)); // point y coordinate in the image
 
     if (px_data < 0.0 || px_data >= cols || py_data < 0.0 || py_data >= rows) {
-      // ROS_INFO_THROTTLE(1, "Point out of image");
+      ROS_INFO_THROTTLE(1, "Point out of image");
       continue;
     }
     ROS_INFO_THROTTLE(1, "Point in image");
