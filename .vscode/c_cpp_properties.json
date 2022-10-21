@@ -1,0 +1,50 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/scout/workspace/catkin/main/devel/include/**",
+        "/opt/ros/melodic/include/**",
+        "/home/scout/workspace/catkin/main/src/airsim_ros_interface/include/**",
+        "/home/scout/workspace/catkin/main/src/cam_lidar_calibration/include/**",
+        "/home/scout/workspace/catkin/main/src/scout_ros/external_libraries/clipp/include/**",
+        "/home/scout/workspace/catkin/main/src/scout_ros/external_libraries/expected_lite/include/**",
+        "/home/scout/workspace/catkin/main/src/scout_ros/external_libraries/fmt_ros/include/**",
+        "/home/scout/workspace/catkin/main/src/scout_ros/external_libraries/include_wrapper/include/**",
+        "/home/scout/workspace/catkin/main/src/mavros/libmavconn/include/**",
+        "/home/scout/workspace/catkin/main/src/livox_camera_calib/include/**",
+        "/home/scout/workspace/catkin/main/src/mavros/mavros/include/**",
+        "/home/scout/workspace/catkin/main/src/mavros/mavros_msgs/include/**",
+        "/home/scout/workspace/catkin/main/src/mlcc/include/**",
+        "/home/scout/workspace/catkin/main/src/ndt_omp/include/**",
+        "/home/scout/workspace/catkin/main/src/scout_ros/external_libraries/nlohmann_json/include/**",
+        "/home/scout/workspace/catkin/main/src/ouster_gazebo_plugins/include/**",
+        "/home/scout/workspace/catkin/main/src/ouster_driver/ouster_ros/include/**",
+        "/home/scout/workspace/catkin/main/src/scout_ros/external_libraries/range_v3/include/**",
+        "/home/scout/workspace/catkin/main/src/scout_ros/scout_camera_manager/include/**",
+        "/home/scout/workspace/catkin/main/src/scout_ros/scout_commands/include/**",
+        "/home/scout/workspace/catkin/main/src/scout_ros/scout_diagnostics/include/**",
+        "/home/scout/workspace/catkin/main/src/scout_ros/scout_gimbal/include/**",
+        "/home/scout/workspace/catkin/main/src/scout_ros/scout_lib/include/**",
+        "/home/scout/workspace/catkin/main/src/scout_ros/scout_lights/include/**",
+        "/home/scout/workspace/catkin/main/src/scout_ros/scout_logger/include/**",
+        "/home/scout/workspace/catkin/main/src/scout_ros/scout_obstacle_detector/include/**",
+        "/home/scout/workspace/catkin/main/src/scout_ros/scout_odometry/include/**",
+        "/home/scout/workspace/catkin/main/src/scout_ros/scout_pointcloud_tools/include/**",
+        "/home/scout/workspace/catkin/main/src/scout_ros/scout_px4_params/include/**",
+        "/home/scout/workspace/catkin/main/src/scout_ros/scout_visualization/include/**",
+        "/home/scout/workspace/catkin/main/src/mavros/test_mavros/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}

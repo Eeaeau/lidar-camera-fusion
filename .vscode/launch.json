@@ -1,0 +1,15 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "ROS: Launch",
+            "type": "ros",
+            "request": "launch",
+            "target": "${workspaceFolder}/launch/os32OnImg.launch",
+            "launch": [
+                "lidar_camera_fusion",
+                "rviz",
+            ]
+        }
+    ]
+}

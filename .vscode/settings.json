@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "random": "cpp",
+        "limits": "cpp"
+    },
+    "python.autoComplete.extraPaths": [
+        "/home/scout/workspace/catkin/main/devel/lib/python2.7/dist-packages",
+        "/opt/ros/melodic/lib/python2.7/dist-packages"
+    ],
+    "ros.distro": "melodic"
+}
