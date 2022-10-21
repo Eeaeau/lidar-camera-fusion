@@ -29,6 +29,7 @@
 #include <armadillo>
 
 #include <chrono>
+#include <XmlRpcException.h>
 
 using namespace Eigen;
 using namespace sensor_msgs;
