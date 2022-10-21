@@ -22,6 +22,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   std_msgs
   tf
+  ouster_ros
 )
 
 find_package(PCL REQUIRED)
@@ -31,6 +32,7 @@ find_package(Boost REQUIRED)
 catkin_package(
   CATKIN_DEPENDS
   DEPENDS PCL
+  ouster_ros
 )
 
 ###########
