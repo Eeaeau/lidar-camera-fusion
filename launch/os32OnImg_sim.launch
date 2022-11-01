@@ -7,15 +7,17 @@
     <param name="min_ang_FOV"     type="double" value="0.1" />
     <param name="pcTopic"         type="str"    value="/os1_cloud_node/points" />
     <!-- <param name="imgTopic"        type="str"    value="/camera_manager/main/image_raw" /> -->
+    <!-- <param name="imgTopic"        type="str"    value="/airsim/sim_image_forwarder/image_raw" /> -->
     <param name="imgTopic"        type="str"    value="/image_rect/rgb" />
     <param name="lidar_frame"     type="str"    value="os1_sensor" />
 
-    <param name="ang_x_resolution"    type="double" value="0.1757812" />
-    <param name="y_interpolation" type="double" value="4.0" />
-    <param name="ang_y_resolution"    type="double" value="1.40625" />
+    <param name="ang_x_resolution"    type="double" value="0.35156" />
+    <param name="y_interpolation" type="double" value="2.0" />
+    <param name="ang_y_resolution"    type="double" value="0.703125" />
+    <param name="extract_albedo"    type="bool" value="true" />
 
     <group ns="matrix_file">
-        <rosparam file="$(find lidar_camera_fusion)/cfg/cfg_params.yaml" />
+        <rosparam file="$(find lidar_camera_fusion)/cfg/cfg_params_sim.yaml" />
     </group>
 
     <node pkg="lidar_camera_fusion" type="lidar_camera_node" name="lidar_camera_node" output="screen"/>

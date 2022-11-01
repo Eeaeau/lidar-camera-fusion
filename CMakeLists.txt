@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.0.2)
 project(lidar_camera_fusion)
 
 set(CMAKE_BUILD_TYPE "Release")
-set(CMAKE_CXX_FLAGS "-std=c++14")
-set(CMAKE_CXX_FLAGS "-std=gnu++14")
+set(CMAKE_CXX_FLAGS "-std=c++17")
+set(CMAKE_CXX_FLAGS "-std=gnu++17")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -g")
 
 ## Compile as C++11, supported in ROS Kinetic and newer
@@ -58,5 +58,3 @@ target_link_libraries(lidar_camera_node
    ${OpenCV_LIBRARIES}
    ${Boost_LIBRARIES}
 )
-
-

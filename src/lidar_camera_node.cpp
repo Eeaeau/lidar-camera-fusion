@@ -35,7 +35,8 @@
 #include <pcl/filters/passthrough.h>
 #include <pcl/filters/crop_box.h>
 
-
+#include <pcl/common/distances.h>
+#include <pcl/point_types_conversion.h>
 
 using namespace Eigen;
 using namespace sensor_msgs;
@@ -67,6 +68,7 @@ float max_depth = 100.0;
 float min_depth = 8.0;
 
 float interpol_value = 20.0;
+bool extract_albedo = false;
 
 // input topics
 std::string imgTopic = "/camera/color/image_raw";
@@ -385,6 +387,7 @@ void callback(const boost::shared_ptr<const sensor_msgs::PointCloud2>& in_pc2, c
 
 
   pcl::PointXYZRGB point;
+  pcl::PointXYZHSV point_hsv;
 
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr pc_color(new pcl::PointCloud<pcl::PointXYZRGB>);
 
@@ -424,6 +427,39 @@ void callback(const boost::shared_ptr<const sensor_msgs::PointCloud2>& in_pc2, c
     point.g = (int)color[1];
     point.b = (int)color[0];
 
+    // ========== Extract albedo color point cloud ========== //
+
+
+    if (extract_albedo) {
+
+      float point_dist_r = pcl::euclideanDistance(point, pcl::PointXYZ(0.285708, -0.159753, -0.060968));
+      float point_dist_l = pcl::euclideanDistance(point, pcl::PointXYZ(0.285708, 0.159753, -0.060968));
+      float point_dist = (point_dist_r + point_dist_l) / 2.0;
+      // ROS_INFO("point_dist: %f", point_dist);
+      float endAttenuation = 20;
+      float factor = std::clamp(1.0f - pow(point_dist / endAttenuation, 4.0f), 0.0f, 1.0f);
+      float light_attenuation = (factor * factor) / ((point_dist * point_dist) + 1.0f);
+      // ROS_INFO("light_attenuation: %f", light_attenuation);
+      // float light_attenuation = 1.0 / (1.0 + 0.0 * point_dist + 0.01 * point_dist * point_dist);
+      // rgb *= 1 - light_attenuation;
+      // rgb *= 0.1;
+      pcl::PointXYZRGBtoXYZHSV(point, point_hsv);
+      if (point_dist < 2 || point_dist > 5.0)
+      {
+        continue;
+      }
+      float flatten_value = point_hsv.v / (64 * light_attenuation);
+      if (flatten_value > 1.0)
+      {
+        continue;
+      }
+      point_hsv.v = flatten_value;
+      pcl::PointXYZHSVtoXYZRGB(point_hsv, point);
+
+    }
+
+
+    // ===================== //
 
     pc_color->points.push_back(point);
 
@@ -461,6 +497,8 @@ int main(int argc, char** argv)
   nh.getParam("/y_interpolation", interpol_value);
 
   nh.getParam("/ang_y_resolution", angular_resolution_y);
+
+  nh.getParam("/extract_albedo", extract_albedo);
 
 
   XmlRpc::XmlRpcValue param;
