@@ -8,7 +8,7 @@
     <param name="pcTopic"         type="str"    value="/os1_cloud_node/points" />
     <!-- <param name="imgTopic"        type="str"    value="/camera_manager/main/image_raw" /> -->
     <!-- <param name="imgTopic"        type="str"    value="/airsim/sim_image_forwarder/image_raw" /> -->
-    <param name="imgTopic"        type="str"    value="/image_rect/rgb" />
+    <param name="imgTopic"        type="str"    value="/airsim/sim_image_forwarder/image_raw" />
     <param name="lidar_frame"     type="str"    value="os1_sensor" />
 
     <param name="ang_x_resolution"    type="double" value="0.35156" />

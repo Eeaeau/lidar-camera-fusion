@@ -444,7 +444,7 @@ void callback(const boost::shared_ptr<const sensor_msgs::PointCloud2>& in_pc2, c
       // rgb *= 1 - light_attenuation;
       // rgb *= 0.1;
       pcl::PointXYZRGBtoXYZHSV(point, point_hsv);
-      if (point_dist < 2 || point_dist > 5.0)
+      if (point_dist < 4 || point_dist > 5.0)
       {
         continue;
       }
